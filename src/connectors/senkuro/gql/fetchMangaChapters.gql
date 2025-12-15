@@ -1,0 +1,77 @@
+query fetchMangaChapters($branchId: ID!, $number: Float, $after: String, $orderBy: MangaChapterOrder!) {
+  mangaChapters(
+    first: 100
+    branchId: $branchId
+    number: $number
+    after: $after
+    orderBy: $orderBy
+  ) {
+    edges {
+      node {
+        ...MangaChapterCommon
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+fragment MangaChapterCommon on MangaChapter {
+  id
+  slug
+  name
+  number
+  volume
+  createdAt
+  creator {
+    ...UserCommon
+  }
+}
+
+fragment UserCommon on User {
+  id
+  slug
+  name
+  verified
+  bot
+  level
+  avatar {
+    ...UserAvatarCommon
+  }
+  frame {
+    ...UserFrameCommon
+  }
+  status {
+    ...UserStatusCommon
+  }
+}
+
+fragment UserAvatarCommon on Image {
+  id
+  animation
+  blurhash
+  original {
+    url
+  }
+}
+
+fragment UserFrameCommon on Image {
+  id
+  animation
+  blurhash
+  original {
+    url
+  }
+}
+
+fragment UserStatusCommon on Image {
+  id
+  animation
+  blurhash
+  caption
+  original {
+    url
+  }
+}
