@@ -102,36 +102,37 @@ function dev_null() {
 
 async function main(args: typeof y_args) {
     const url_output_name: [string | null, string][] = [];
+    const input_args = args['urls-or-name'] as string[];
     
-    if (args._.length === 0)
+    if (input_args.length === 0)
         throw new Error('Необходимо указать хотя бы одну ссылку');
     
-    const is_name_left = !isUrl(args._[0]) && isUrl(args._.slice(1));
-    const is_name_right = isUrl(args._.slice(0, -1)) && !isUrl(args._[args._.length - 1]);
-    const is_name_for_entries = args._.length % 2 === 0 && array_chunk(args._, 2).every((chunk) => isUrl(chunk[0]) && !isUrl(chunk[1]));
-    const is_url_only = isUrl(args._);
+    const is_name_left = !isUrl(input_args[0]) && isUrl(input_args.slice(1));
+    const is_name_right = isUrl(input_args.slice(0, -1)) && !isUrl(input_args[input_args.length - 1]);
+    const is_name_for_entries = input_args.length % 2 === 0 && array_chunk(input_args, 2).every((chunk) => isUrl(chunk[0]) && !isUrl(chunk[1]));
+    const is_url_only = isUrl(input_args);
     
     switch (true) {
         case is_name_left: {
-            const name = args._[0];
+            const name = input_args[0];
             
-            args._.slice(1).forEach((arg) => {
+            input_args.slice(1).forEach((arg) => {
                 url_output_name.push([ name.toString(), arg.toString() ]);
             });
             break
         }
         
         case is_name_right: {
-            const name = args._[args._.length - 1];
+            const name = input_args[input_args.length - 1];
             
-            args._.slice(0, -1).forEach((arg) => {
+            input_args.slice(0, -1).forEach((arg) => {
                 url_output_name.push([ name.toString(), arg.toString() ]);
             });
             break;
         }
         
         case is_name_for_entries: {
-            array_chunk(args._, 2)
+            array_chunk(input_args, 2)
                 .forEach((arg) => {
                     url_output_name.push([ arg[0].toString(), arg[1].toString() ]);
                 });
@@ -139,7 +140,7 @@ async function main(args: typeof y_args) {
         }
         
         case is_url_only: {
-            args._.forEach((arg) => {
+            input_args.forEach((arg) => {
                 url_output_name.push([ null, arg.toString() ]);
             });
             break;
@@ -163,6 +164,8 @@ async function main(args: typeof y_args) {
     Config.save_chapter_name = args['save-chapter-name'];
     Config.skip_failed = args['skip-failed'];
     Config.max_chapters = args['max-chapters'];
+    
+    MultiProgress.init();
     
     const bar_total = MultiProgress.newBar(`total`, {
         total: url_output_name.length,
@@ -313,10 +316,18 @@ const y_args = await yargs(hideBin(process.argv))
         description: 'Скачать max-chapters глав',
         default: null,
     })
-    .command('$0', 'Скачать заданные ссылки',
-        (yargs) => yargs,
+    .command('$0 <urls-or-name...>', 'Ссылки для скачивания/название директории для скачивания',
+        (yargs) => yargs
+            .check((argv) => {
+                if (!(argv['urls-or-name'] as any).length) {
+                    throw new Error('Error: Не указано ни одной ссылки для загрузки');
+                }
+                
+                return true;
+            }),
         async (argv) => {
             await main(argv);
-        })
-    .showHelpOnFail(true)
+        }
+    )
+    .strict()
     .parseAsync();

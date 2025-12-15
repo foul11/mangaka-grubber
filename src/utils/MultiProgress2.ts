@@ -3,11 +3,7 @@ import type { AddOptions } from 'multi-progress-bars';
 
 
 export class MultiProgress {
-    static instance = new MultiProgressBars({
-        border: true,
-        header: 'Mangaka Grubber',
-        persist: true,
-    });
+    static instance: MultiProgressBars | undefined;
     
     task_name: string;
     total: number;
@@ -19,20 +15,28 @@ export class MultiProgress {
     }
     
     static newBar(task: string, options: Omit<AddOptions, 'type'> & { total: number, type?: AddOptions['type'] }) {
-        MultiProgress.instance.addTask(task, {
+        MultiProgress.instance!.addTask(task, {
             type: 'percentage',
             ...options,
         });
         return new MultiProgress(task, options.total);
     }
     
+    static init() {
+        MultiProgress.instance = new MultiProgressBars({
+            border: true,
+            header: 'Mangaka Grubber',
+            persist: true,
+        });
+    }
+    
     tick(value: number = 1) {
         this.curr += value;
         
-        MultiProgress.instance.updateTask(this.task_name, { percentage: this.curr / this.total });
+        MultiProgress.instance!.updateTask(this.task_name, { percentage: this.curr / this.total });
     }
     
     terminate() {
-        MultiProgress.instance.done(this.task_name);
+        MultiProgress.instance!.done(this.task_name);
     }
 }
