@@ -27,6 +27,10 @@ export interface IConnectorAPI {
     isAlterChapters(): Promise<boolean>;
 }
 
+function importMetaUrl() {
+    return import.meta.url.replace('Connector.ts', '').replace('\\', '/').replace('file://', '');
+}
+
 export class Connector {
     progressBarSetup(label: string, length: number) {
         return MultiProgress.newBar(`${label}`, {
@@ -37,8 +41,8 @@ export class Connector {
     
     static async new(url: string): Promise<Connector & IConnectorAPI> {
         switch (true) {
-            case /^https?:..senkuro.(?:com|me)/.test(url): return import(path.join(import.meta.url.replace('Connector.ts', ''), './connectors/senkuro/index.ts'))  .then(({ Senkuro })   => new Senkuro(url));
-            case /^https?:..webfandom.(?:ru)/  .test(url): return import(path.join(import.meta.url.replace('Connector.ts', ''), './connectors/webfandom/index.ts')).then(({ Webfandom }) => new Webfandom(url));
+            case /^https?:..senkuro.(?:com|me)/.test(url): return import(path.join(importMetaUrl(), './connectors/senkuro/index.ts'))  .then(({ Senkuro })   => new Senkuro(url));
+            case /^https?:..webfandom.(?:ru)/  .test(url): return import(path.join(importMetaUrl(), './connectors/webfandom/index.ts')).then(({ Webfandom }) => new Webfandom(url));
             
             default: throw new Error('Unknown connector');
         }
