@@ -28,7 +28,7 @@ export interface IConnectorAPI {
 }
 
 function importMetaUrl() {
-    return import.meta.url.replace('Connector.ts', '').replace('\\', '/').replace('file:///', '');
+    return decodeURIComponent(import.meta.url.replace('Connector.ts', ''));
 }
 
 export class Connector {
