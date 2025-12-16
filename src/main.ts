@@ -15,8 +15,10 @@ import { ErrorRetry, retryOnFailure } from './utils/fetch';
 import { Config } from './Config';
 import { padLeft } from './utils/mics';
 
-import type { ConnectorMangaChapter, ConnectorMangaPage } from './Connector';
-// import type { ReadableStream } from 'stream/web';
+import { Webfandom } from './connectors/webfandom';
+import { Senkuro } from './connectors/senkuro';
+
+import type { ConnectorMangaChapter, ConnectorMangaPage, IConnectorAPI } from './Connector';
 
 type IS_URL_INPUT = string | number | (string | number)[];
 
@@ -100,6 +102,15 @@ function dev_null() {
     )();
 }
 
+function new_connector(url: string): Connector & IConnectorAPI {
+        switch (true) {
+            case /^https?:..senkuro.(?:com|me)/.test(url): return new Senkuro(url);
+            case /^https?:..webfandom.(?:ru)/  .test(url): return new Webfandom(url);
+            
+            default: throw new Error('Unknown connector');
+        }
+}
+
 async function main(args: typeof y_args) {
     const url_output_name: [string | null, string][] = [];
     const input_args = args['urls-or-name'] as string[];
@@ -172,7 +183,7 @@ async function main(args: typeof y_args) {
     });
     
     for (const [ name, url ] of url_output_name) {
-        const connector = await Connector.new(url);
+        const connector = new_connector(url);
         const manga_name = await connector.getName();
         const output_dir = name
             ? path.join(args['output-dir'], name)

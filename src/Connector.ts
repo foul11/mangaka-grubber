@@ -38,13 +38,4 @@ export class Connector {
             total: length,
         });
     }
-    
-    static async new(url: string): Promise<Connector & IConnectorAPI> {
-        switch (true) {
-            case /^https?:..senkuro.(?:com|me)/.test(url): return import(path.join(importMetaUrl(), './connectors/senkuro/index.ts'))  .then(({ Senkuro })   => new Senkuro(url));
-            case /^https?:..webfandom.(?:ru)/  .test(url): return import(path.join(importMetaUrl(), './connectors/webfandom/index.ts')).then(({ Webfandom }) => new Webfandom(url));
-            
-            default: throw new Error('Unknown connector');
-        }
-    }
 }
