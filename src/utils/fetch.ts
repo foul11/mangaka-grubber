@@ -9,7 +9,8 @@ export async function retryOnFailure<T>(cb: (abort: AbortSignal) => Promise<T>, 
     } catch (err) {
         if (!(err instanceof DOMException) &&
             !(err instanceof ErrorRetry) &&
-            (err as any)?.code !== 'EAI_AGAIN'
+            (err as any)?.code !== 'EAI_AGAIN' &&
+            (err as any)?.code !== 'UND_ERR_SOCKET'
         ) {
             throw err;
         }
