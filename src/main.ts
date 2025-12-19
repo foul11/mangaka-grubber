@@ -222,7 +222,7 @@ async function main(args: typeof y_args) {
                     await concurrencySeries(args['concurrency'], chapter.pages,
                         async (page) => {
                             return new Promise<ArrayBuffer>((resolve, reject) => {
-                                download_page(page, async (res) => resolve(res.arrayBuffer()));
+                                download_page(page, async (res) => resolve(await res.arrayBuffer()));
                             });
                         },
                         async (image) => {
