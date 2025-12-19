@@ -7,13 +7,13 @@ export async function retryOnFailure<T>(cb: (abort: AbortSignal) => Promise<T>, 
         const timeout = AbortSignal.timeout(Config.timeout);
         return await cb(timeout);
     } catch (err) {
-        if (!(err instanceof DOMException) &&
-            !(err instanceof ErrorRetry) &&
-            (err as any)?.code !== 'EAI_AGAIN' &&
-            (err as any)?.code !== 'UND_ERR_SOCKET'
-        ) {
-            throw err;
-        }
+        // if (!(err instanceof DOMException) &&
+        //     !(err instanceof ErrorRetry) &&
+        //     (err as any)?.code !== 'EAI_AGAIN' &&
+        //     (err as any)?.code !== 'UND_ERR_SOCKET'
+        // ) {
+        //     throw err;
+        // }
         
         if (retryCount >= Config.max_retries) {
             throw err;
