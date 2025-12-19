@@ -126,13 +126,14 @@ export class Webfandom extends Connector implements IConnectorAPI {
         const short_name = await this.getShortName();
         const chapters = (await this.fetchMangaChapters()).list;
         const result: ConnectorMangaChapter[] = [];
-        const sem = new Sema(10);
+        const sem = new Sema(5);
         const bar = this.progressBarSetup(`Получение глав [${short_name}]`, chapters.length);
         
         await Promise.all(
             chapters.map(async (chapter) => {
                 await sem.acquire();
                 
+                await new Promise(resolve => setTimeout(resolve, 150));
                 const pages = await this.fetchPages(chapter.slug);
                 result.push(this.toConnectorNode(pages));
                 bar.tick();
