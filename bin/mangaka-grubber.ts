@@ -1,2 +1,2 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env tsx
 import '../src/main';
