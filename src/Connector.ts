@@ -1,8 +1,5 @@
 // import { multiProgressBar } from './utils/MultiProgress';
 import { MultiProgress } from './utils/MultiProgress2';
-import { fileURLToPath } from 'url';
-
-import path from 'path';
 
 export interface ConnectorMangaPage {
     seq: number

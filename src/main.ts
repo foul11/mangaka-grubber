@@ -2,7 +2,7 @@ import path from 'path';
 import yargs from 'yargs';
 import sharp from 'sharp';
 import PDFDocument from 'pdfkit';
-import concurrencySeries from './utils/ConcurrencySeries';
+import concurrency_series from './utils/concurrency_series';
 
 import { mkdirSync, createWriteStream } from 'fs';
 import { Readable, Writable } from 'stream';
@@ -219,7 +219,7 @@ async function main(args: typeof y_args) {
                 const stream = doc.pipe(createWriteStream(output_path));
                 
                 for (const chapter of chunk) {
-                    await concurrencySeries(args['concurrency'], chapter.pages,
+                    await concurrency_series(args['concurrency'], chapter.pages,
                         async (page) => {
                             return new Promise<ArrayBuffer>((resolve, reject) => {
                                 download_page(page, async (res) => resolve(await res.arrayBuffer()));
@@ -248,7 +248,7 @@ async function main(args: typeof y_args) {
                 await finished(stream);
             }
         } else {
-            await concurrencySeries(args['concurrency'], chapters,
+            await concurrency_series(args['concurrency'], chapters,
                 async (chapter) => {
                     const chapter_output_dir = path.join(output_dir, chapter_to_path(chapter));
                     

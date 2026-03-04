@@ -1,11 +1,11 @@
 import { Sema } from 'async-sema';
 
-export default async function concurrencySeries<
+export default async function concurrency_series<
     Task,
     TaskResult,
     SerialResult,
     OnCompleteSerial extends ((task_result: TaskResult) => Promise<SerialResult>) | undefined,
-    Result extends OnCompleteSerial extends undefined ? TaskResult : SerialResult
+    Result extends OnCompleteSerial extends undefined ? TaskResult : SerialResult,
 >(
     concurrency: number,
     task_list: Task[],
@@ -19,13 +19,15 @@ export default async function concurrencySeries<
     for (const task of task_list) {
         await sem.acquire();
         
-        const task_promise = (async (task_result_promise: Promise<TaskResult>, last_promise: Promise<any>): Promise<Result> => {
+        const task_promise = (async (task_result_promise: Promise<TaskResult>, last_promise_arg: Promise<any>): Promise<Result> => {
             if (on_complete_serial === undefined) {
+                const task_result = await task_result_promise;
+                
                 sem.release();
-                return task_result_promise as any;
-            };
+                return task_result as any;
+            }
             
-            await last_promise;
+            await last_promise_arg;
             
             const task_result = await task_result_promise;
             const serial_result = await on_complete_serial(task_result);
